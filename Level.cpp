@@ -24,13 +24,14 @@ void ColorCheck(char sign)
 	case 'S': ColorChange(8, 8); break;
 	case ':': ColorChange(7, 7); break;
 	case '@': ColorChange(7, 0); break;
-	case '$': ColorChange(7, 4); break;
+	case '$': ColorChange(7, 7); break;
+	case '&': ColorChange(7, 4); break;
 	default: ColorChange(0, 15);
 	}
 
 }
 
-void PrintMap(char mas[N][N], int rows, int cols)
+void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
 {
 	char sign;
 	for (int i = 0; i < rows; i++)
@@ -38,9 +39,40 @@ void PrintMap(char mas[N][N], int rows, int cols)
 		printf("\t\t\t");
 		for (int j = 0; j < cols; j++)
 		{
-			sign = mas[i][j];
-			ColorCheck(sign);
-			printf("%c", mas[i][j]);
+			if (mas[i][j] == 'H' || mas[i][j] == 'S' || mas[i][j] == ':')
+			{
+				sign = mas[i][j];
+				ColorCheck(sign);
+				printf("%c", mas[i][j]);
+			}
+			else if (abs(i - PLR) <= 3 && abs(j - PLC) <= 5)
+			{
+				switch (mas[i][j])
+				{
+				case 'h': mas[i][j] = 'H'; break;
+				case 's': mas[i][j] = 'S'; break;
+				case ';': mas[i][j] = ':'; break;
+				case '*': mas[i][j] = '$'; break;
+				default: break;
+				}
+				if (mas[i][j] == '$') ColorCheck('&');
+				else
+				{
+					sign = mas[i][j];
+					ColorCheck(sign);
+				}
+				printf("%c", mas[i][j]);
+			}
+			else if (mas[i][j] == '$')
+			{
+				ColorCheck('$');
+				printf("%c", mas[i][j]);
+			}
+			else
+			{
+				printf(" ");
+				ColorChange(0, 15);
+			}
 		}
 		printf("\n");
 	}
@@ -81,24 +113,24 @@ void SetMapForSavedGame(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 {
 	char input;
-	int defaultcheck;
+	int MoveCheck;
 	do
 	{
 		int exit = 0;
-		defaultcheck = 0;
+		MoveCheck = 0;
 		// PLR = PlayerLocationRow
 		// PLC = PlayerLocationCol
 		input = _getch();
 		switch (input)
 		{
-		case 'w': KeyboardInput_W(mas, rows, cols, PLR, PLC); break;
-		case 's': KeyboardInput_S(mas, rows, cols, PLR, PLC); break;
-		case 'd': KeyboardInput_D(mas, rows, cols, PLR, PLC); break;
-		case 'a': KeyboardInput_A(mas, rows, cols, PLR, PLC); break;
+		case 'w': MoveCheck = KeyboardInput_W(mas, rows, cols, PLR, PLC); break;
+		case 's': MoveCheck = KeyboardInput_S(mas, rows, cols, PLR, PLC); break;
+		case 'd': MoveCheck = KeyboardInput_D(mas, rows, cols, PLR, PLC); break;
+		case 'a': MoveCheck = KeyboardInput_A(mas, rows, cols, PLR, PLC); break;
 		case 'q': exit += 1; return exit; break;
-		default: defaultcheck += 1;
+		default: MoveCheck = 1;
 		}
-	} while (defaultcheck == 1);
+	} while (MoveCheck == 1);
 }
 
 void SaveGame(char mas[N][N], int rows, int cols, int PLR, int PLC)
@@ -148,7 +180,7 @@ void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int 
 		AllEnemyMove(mas, enemy, ec, a, b, PLC, PLR);
 		battleSearch(mas,ec,player, enemy, PLR, PLC);
 		system("cls");
-		PrintMap(mas, rows, cols);
+		PrintMap(mas, rows, cols, PLR, PLC);
 	} while (true);
 }
 
@@ -167,7 +199,7 @@ int main()
 	
 	StartGameChoice(mas, rows, cols, PLR, PLC);
 
-	PrintMap(mas, rows, cols);
+	PrintMap(mas, rows, cols, PLR, PLC);
 
 	GameItteration(mas, rows, cols, PLR, PLC,a,b,enemy,ec);
 

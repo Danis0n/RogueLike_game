@@ -9,41 +9,137 @@
 
 void Enemy_W(char mas[N][N], Enemy* enemy, int i)
 {
-	if (mas[enemy[i].ex - 1][enemy[i].ey] != 'H')
+	if (mas[enemy[i].ex - 1][enemy[i].ey] == ';')
 	{
-		mas[enemy[i].ex - 1][enemy[i].ey] = '$';
-		mas[enemy[i].ex][enemy[i].ey] = ':';
-		enemy[i].ex -= 1;
+		if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex - 1][enemy[i].ey] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ex -= 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex - 1][enemy[i].ey] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ex -= 1;
+		}
+	}
+	else if (mas[enemy[i].ex - 1][enemy[i].ey] == ':')
+	{
+		if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex - 1][enemy[i].ey] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ex -= 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex - 1][enemy[i].ey] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ex -= 1;
+		}
 	}
 }
 
 void Enemy_A(char mas[N][N], Enemy* enemy, int i)
 {
-	if (mas[enemy[i].ex][enemy[i].ey - 1] != 'H')
+	if (mas[enemy[i].ex][enemy[i].ey - 1] == ';')
 	{
-		mas[enemy[i].ex][enemy[i].ey - 1] = '$';
-		mas[enemy[i].ex][enemy[i].ey] = ':';
-		enemy[i].ey -= 1;
+		if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex][enemy[i].ey - 1] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ey -= 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex][enemy[i].ey - 1] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ey -= 1;
+		}
+	}
+	else if (mas[enemy[i].ex][enemy[i].ey - 1] == ':')
+	{
+		if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex][enemy[i].ey - 1] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ey -= 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex][enemy[i].ey - 1] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ey -= 1;
+		}
 	}
 }
 
 void Enemy_D(char mas[N][N], Enemy* enemy, int i)
 {
-	if (mas[enemy[i].ex][enemy[i].ey + 1] != 'H')
+	if (mas[enemy[i].ex][enemy[i].ey + 1] == ';')
 	{
-		mas[enemy[i].ex][enemy[i].ey + 1] = '$';
-		mas[enemy[i].ex][enemy[i].ey] = ':';
-		enemy[i].ey += 1;
+		if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex][enemy[i].ey + 1] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ey += 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex][enemy[i].ey + 1] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ey += 1;
+		}
+	}
+	else if (mas[enemy[i].ex][enemy[i].ey + 1] == ':')
+	{
+		if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex][enemy[i].ey + 1] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ey += 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex][enemy[i].ey + 1] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ey += 1;
+		}
 	}
 }
-																						// Enemy movement
+// Enemy movement
 void Enemy_S(char mas[N][N], Enemy* enemy, int i)
 {
-	if (mas[enemy[i].ex + 1][enemy[i].ey] != 'H')
+	if (mas[enemy[i].ex + 1][enemy[i].ey] == ';')
 	{
-		mas[enemy[i].ex + 1][enemy[i].ey] = '$';
-		mas[enemy[i].ex][enemy[i].ey] = ':';
-		enemy[i].ex += 1;
+		if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex + 1][enemy[i].ey] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ex += 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex + 1][enemy[i].ey] = '*';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ex += 1;
+		}
+	}
+	else if (mas[enemy[i].ex + 1][enemy[i].ey] == ':')
+	{
+		if (mas[enemy[i].ex][enemy[i].ey] == '$')
+		{
+			mas[enemy[i].ex + 1][enemy[i].ey] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ':';
+			enemy[i].ex += 1;
+		}
+		else if (mas[enemy[i].ex][enemy[i].ey] == '*')
+		{
+			mas[enemy[i].ex + 1][enemy[i].ey] = '$';
+			mas[enemy[i].ex][enemy[i].ey] = ';';
+			enemy[i].ex += 1;
+		}
 	}
 }
 
@@ -53,7 +149,7 @@ int enemycount1(char mas[N][N], int rows, int cols, Enemy* enemy)
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
 		{
-			if (mas[i][j] == '$')
+			if (mas[i][j] == '$' || mas[i][j] == '*')
 			{
 				ec1++;
 				enemy[ec1].ex = i;
