@@ -1,0 +1,4 @@
+﻿  Enemy.cpp
+D:\VS\projects\GameBuild\GameBuild\Global.h(7,2): warning C4091: extern : пропускается слева от "Enemy", когда ни одна переменная не объявлена
+D:\VS\projects\GameBuild\GameBuild\Global.h(11,2): warning C4091: extern : пропускается слева от "Player", когда ни одна переменная не объявлена
+  GameBuild.vcxproj -> D:\VS\projects\GameBuild\Debug\GameBuild.exe
