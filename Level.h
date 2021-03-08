@@ -14,9 +14,11 @@ void SetMapForNewGame(char mas[N][N], int rows, int cols);
 void ColorChange(int backcolor, int textcolor);
 int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC);
 
+int MainMenu(char mas[N][N], int rows, int cols, int& PLR, int& PLC);
+void Tutorial();
 void SaveGame(char mas[N][N], int rows, int cols, int PLR, int PLC);
 void SetMapForSavedGame(char mas[N][N], int rows, int cols, int& PLR, int& PLC);
-void StartGameChoice(char mas[N][N], int rows, int cols, int& PLR, int& PLC);
+int StartGameChoice(char mas[N][N], int rows, int cols, int& PLR, int& PLC);
 void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int a, int b, Enemy* enemy, int& ec);
 
 void battleSearch(char mas[N][N],int &ec, Player* player, Enemy* enemy, int PLR, int PLC);

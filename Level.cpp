@@ -4,6 +4,7 @@
 #include<conio.h>
 #include<Windows.h>
 #include<math.h>
+#include <string.h>
 #include "Level.h"
 #include "Player.h"
 
@@ -81,6 +82,7 @@ void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
 
 void SetMapForNewGame(char mas[N][N], int rows, int cols)
 {
+
 	FILE* input;
 
 	fopen_s(&input, "level1.txt", "r");
@@ -96,9 +98,32 @@ void SetMapForNewGame(char mas[N][N], int rows, int cols)
 
 void SetMapForSavedGame(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 {
+	char keyboardinput;
+	int SwitchCheck;
+	char savename[15] = "save1.txt";
+
+	do
+	{
+		printf("Выберите слот сохраниения:\n\
+1 Слот.\n\
+2 Слот.\n\
+3 Слот.\n\
+Нажмите 1, 2 или 3.");
+		SwitchCheck = 0;
+		keyboardinput = _getch();
+		switch (keyboardinput)
+		{
+		case '1': break;
+		case '2': savename[4] = '2'; break;
+		case '3': savename[4] = '3'; break;
+		default: SwitchCheck = 1;
+		}
+		system("cls");
+	} while (SwitchCheck == 1);
+	
 	FILE* input;
 
-	fopen_s(&input, "save1.txt", "r");
+	fopen_s(&input, savename, "r");
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
@@ -123,11 +148,16 @@ int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 		input = _getch();
 		switch (input)
 		{
+		case 'ц':
 		case 'w': MoveCheck = KeyboardInput_W(mas, rows, cols, PLR, PLC); break;
+		case 'ы':
 		case 's': MoveCheck = KeyboardInput_S(mas, rows, cols, PLR, PLC); break;
+		case 'в':
 		case 'd': MoveCheck = KeyboardInput_D(mas, rows, cols, PLR, PLC); break;
+		case 'ф':
 		case 'a': MoveCheck = KeyboardInput_A(mas, rows, cols, PLR, PLC); break;
-		case 'q': exit += 1; return exit; break;
+		case 'й':
+		case 'q': exit = MainMenu(mas, rows, cols, PLR, PLC); return exit; break;
 		default: MoveCheck = 1;
 		}
 	} while (MoveCheck == 1);
@@ -135,10 +165,32 @@ int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 
 void SaveGame(char mas[N][N], int rows, int cols, int PLR, int PLC)
 {
+	char keyboardinput;
+	int SwitchCheck;
+	char savename[15] = "save1.txt";
+
+	do
+	{
+		printf("Выберите слот сохраниения:\n\
+1 Слот.\n\
+2 Слот.\n\
+3 Слот.\n\
+Нажмите 1, 2 или 3.");
+		SwitchCheck = 0;
+		keyboardinput = _getch();
+		switch (keyboardinput)
+		{
+		case '1': break;
+		case '2': savename[4] = '2'; break;
+		case '3': savename[4] = '3'; break;
+		default: SwitchCheck = 1;
+		}
+		system("cls");
+	} while (SwitchCheck == 1);
 
 	FILE* save;
 
-	fopen_s(&save, "save1.txt", "w");
+	fopen_s(&save, savename, "w");
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
@@ -151,21 +203,72 @@ void SaveGame(char mas[N][N], int rows, int cols, int PLR, int PLC)
 	fclose(save);
 }
 
-void StartGameChoice(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
+int StartGameChoice(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 {
 	char input;
-	printf("\n\
-    1.Новая игра\n\
-    2.Продолжить сохранение\n");
+	int inputcheck;
+	printf("Добро пожаловать!\n\
+    1.Новая игра.\n\
+    2.Загрузить игру.\n\
+    3.Справка.\n\
+    4.Выход.\n");
 	do
 	{
+		inputcheck = 0;
 		input = _getch();
 		switch (input)
 		{
 		case '1': system("cls"); SetMapForNewGame(mas, rows, cols); break;
 		case '2': system("cls"); SetMapForSavedGame(mas, rows, cols, PLR, PLC); break;
+		case '3': system("cls"); Tutorial(); StartGameChoice(mas, rows, cols, PLR, PLC); break;
+		case '4': system("cls"); return(1);  break;
+		default: inputcheck = 1;
 		}
-	} while (input != '1' && input != '2');
+	} while (inputcheck == 1);
+}
+
+int MainMenu(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
+{
+	system("cls");
+	char input;
+	printf("ПАУЗА\n\
+    1.Новая игра\n\
+    2.Загрузить игру\n\
+    3.Сохранить игру\n\
+    4.Справка\n\
+    5.Выход\n\
+    Нажмите q, чтобы продолжить.\n");
+	int inputcheck;
+	do
+	{
+		inputcheck = 0;
+		input = _getch();
+		switch (input)
+		{
+		case '1': system("cls"); PLR = 1; PLC = 1; SetMapForNewGame(mas, rows, cols); break;
+		case '2': system("cls"); SetMapForSavedGame(mas, rows, cols, PLR, PLC); break;
+		case '3': system("cls"); SaveGame(mas, rows, cols, PLR, PLC); break;
+		case '4': system("cls"); Tutorial(); MainMenu(mas, rows, cols, PLR, PLC); break;
+		case '5': system("cls"); return(1); break;
+		case 'й':
+		case 'q': system("cls"); PrintMap(mas, rows, cols, PLR, PLC); return(0); break;
+		default: inputcheck = 1; 
+		}
+	} while (inputcheck == 1);
+}
+
+void Tutorial()
+{
+	char input;
+	printf("СПРАВКА\n");
+	printf("w, a, d, s - ходьба.\n");
+	printf("q - открыть/закрыть меню.\n");
+	printf("нажмите q, чтобы закрыть справку.\n");
+	do
+	{
+		input = _getch();
+	} while (input != 'q' && input != 'й');
+	system("cls");
 }
 
 void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int a, int b, Enemy* enemy, int& ec)
@@ -192,19 +295,18 @@ int main()
 	system("chcp 1251");
 	system("cls");
 	char mas[N][N];
-	int rows = 25, cols = 80, ec = 0, a = 0, b = 0;
+	int rows = 25, cols = 80, ec = 0, a = 0, b = 0, exit = 0;
 	//PLR = PlayerLocationRows
 	//PLC = PlayerLocationCols
 	int PLR = 1, PLC = 1;
-	
-	StartGameChoice(mas, rows, cols, PLR, PLC);
+	do
+	{
+		exit = StartGameChoice(mas, rows, cols, PLR, PLC);
+		if (exit == 1) break;
+		PrintMap(mas, rows, cols, PLR, PLC);
+		GameItteration(mas, rows, cols, PLR, PLC, a, b, enemy, ec);
+	} while (exit == 1);
 
-	PrintMap(mas, rows, cols, PLR, PLC);
-
-	GameItteration(mas, rows, cols, PLR, PLC,a,b,enemy,ec);
-
-	SaveGame(mas, rows, cols, PLR, PLC);
-
-	system("pause");
+	//system("pause");
 	return 0;
 }
