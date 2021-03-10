@@ -27,6 +27,7 @@ void ColorCheck(char sign)
 	case '@': ColorChange(7, 0); break;
 	case '$': ColorChange(7, 7); break;
 	case '&': ColorChange(7, 4); break;
+	case 'E': ColorChange(6, 6); break;
 	default: ColorChange(0, 15);
 	}
 
@@ -40,13 +41,13 @@ void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
 		printf("\t\t\t");
 		for (int j = 0; j < cols; j++)
 		{
-			if (mas[i][j] == 'H' || mas[i][j] == 'S' || mas[i][j] == ':')
+			if (mas[i][j] == 'H' || mas[i][j] == 'S' || mas[i][j] == ':' || mas[i][j] == 'E') 
 			{
 				sign = mas[i][j];
 				ColorCheck(sign);
 				printf("%c", mas[i][j]);
 			}
-			else if (abs(i - PLR) <= 3 && abs(j - PLC) <= 5)
+			else if (abs(i - PLR) <= 2 && abs(j - PLC) <= 2)
 			{
 				switch (mas[i][j])
 				{
@@ -54,6 +55,7 @@ void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
 				case 's': mas[i][j] = 'S'; break;
 				case ';': mas[i][j] = ':'; break;
 				case '*': mas[i][j] = '$'; break;
+				case 'e': mas[i][j] = 'E'; break;
 				default: break;
 				}
 				if (mas[i][j] == '$') ColorCheck('&');
@@ -91,6 +93,35 @@ void SetMapForNewGame(char mas[N][N], int rows, int cols)
 		for (int j = 0; j < cols; j++)
 		{
 			fscanf_s(input, "%c ", &mas[i][j], 200);
+		}
+	}
+	fclose(input);
+}
+
+void NextLevelPass(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& levelpasscount)
+{
+	levelpasscount += 1;
+	char levelname[15] = "level1.txt";
+	PLR = 1; PLC = 1;
+
+	printf("Уровень пройден!\n");
+	system("pause");
+	system("cls");
+	switch (levelpasscount)
+	{
+	case 2: levelname[5] = '2'; break;
+	case 3: levelname[5] = '3'; break;
+	default: printf("Вы прошли игру!!!!!!!!");
+	}
+
+	FILE* input;
+
+	fopen_s(&input, levelname, "r");
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			fscanf_s(input, "%c ", &mas[i][j], 100);
 		}
 	}
 	fclose(input);
@@ -135,7 +166,7 @@ void SetMapForSavedGame(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 	fclose(input);
 }
 
-int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
+int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& levelpasscount)
 {
 	char input;
 	int MoveCheck;
@@ -149,13 +180,13 @@ int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 		switch (input)
 		{
 		case 'ц':
-		case 'w': MoveCheck = KeyboardInput_W(mas, rows, cols, PLR, PLC); break;
+		case 'w': MoveCheck = KeyboardInput_W(mas, rows, cols, PLR, PLC, levelpasscount); break;
 		case 'ы':
-		case 's': MoveCheck = KeyboardInput_S(mas, rows, cols, PLR, PLC); break;
+		case 's': MoveCheck = KeyboardInput_S(mas, rows, cols, PLR, PLC, levelpasscount); break;
 		case 'в':
-		case 'd': MoveCheck = KeyboardInput_D(mas, rows, cols, PLR, PLC); break;
+		case 'd': MoveCheck = KeyboardInput_D(mas, rows, cols, PLR, PLC, levelpasscount); break;
 		case 'ф':
-		case 'a': MoveCheck = KeyboardInput_A(mas, rows, cols, PLR, PLC); break;
+		case 'a': MoveCheck = KeyboardInput_A(mas, rows, cols, PLR, PLC, levelpasscount); break;
 		case 'й':
 		case 'q': exit = MainMenu(mas, rows, cols, PLR, PLC); return exit; break;
 		default: MoveCheck = 1;
@@ -271,14 +302,13 @@ void Tutorial()
 	system("cls");
 }
 
-void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int a, int b, Enemy* enemy, int& ec)
+void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int a, int b, Enemy* enemy, int& ec, int& levelpasscount)
 {
 	int exit = 0;
-
 	do
 	{
 		ec = enemycount1(mas, rows, cols, enemy);
-		exit = KeyboardInput(mas, rows, cols, PLR, PLC);
+		exit = KeyboardInput(mas, rows, cols, PLR, PLC, levelpasscount);
 		if (exit == 1) break;
 		AllEnemyMove(mas, enemy, ec, a, b, PLC, PLR);
 		battleSearch(mas,ec,player, enemy, PLR, PLC);
@@ -295,7 +325,7 @@ int main()
 	system("chcp 1251");
 	system("cls");
 	char mas[N][N];
-	int rows = 25, cols = 80, ec = 0, a = 0, b = 0, exit = 0;
+	int rows = 30, cols = 80, ec = 0, a = 0, b = 0, exit = 0, levelpasscount = 1;
 	//PLR = PlayerLocationRows
 	//PLC = PlayerLocationCols
 	int PLR = 1, PLC = 1;
@@ -304,7 +334,7 @@ int main()
 		exit = StartGameChoice(mas, rows, cols, PLR, PLC);
 		if (exit == 1) break;
 		PrintMap(mas, rows, cols, PLR, PLC);
-		GameItteration(mas, rows, cols, PLR, PLC, a, b, enemy, ec);
+		GameItteration(mas, rows, cols, PLR, PLC, a, b, enemy, ec, levelpasscount);
 	} while (exit == 1);
 
 	//system("pause");
