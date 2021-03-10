@@ -2,7 +2,7 @@
 #include "Player.h"
 
 
-///Player Movement
+////Player Movement
 int KeyboardInput_W(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& levelpasscount)
 {
 	if (mas[PLR - 1][PLC] != 'H')
@@ -31,7 +31,7 @@ int KeyboardInput_A(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int&
 		}
 	}
 	else return 1;
-}   
+}
 
 int KeyboardInput_D(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& levelpasscount)
 {

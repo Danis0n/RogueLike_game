@@ -10,30 +10,30 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void ColorChange(int backcolor, int textcolor)
+void ColorChange(int backcolor, int textcolor, int colorlessmodecheck)
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (colorlessmodecheck == 1) { backcolor = 0; textcolor = 15; }
 	SetConsoleTextAttribute(hConsole, (WORD)((backcolor << 4) | textcolor));
 }
 
-void ColorCheck(char sign)
+void ColorCheck(char sign, int colorlessmodecheck)
 {
 	int backcolor = 0, textcolor = 15;
 	switch (sign)
 	{
-	case 'H': ColorChange(8, 8); break;
-	case 'S': ColorChange(8, 8); break;
-	case ':': ColorChange(7, 7); break;
-	case '@': ColorChange(7, 0); break;
-	case '$': ColorChange(7, 7); break;
-	case '&': ColorChange(7, 4); break;
-	case 'E': ColorChange(6, 6); break;
-	default: ColorChange(0, 15);
+	case 'H': ColorChange(8, 8, colorlessmodecheck); break;
+	case 'S': ColorChange(8, 8, colorlessmodecheck); break;
+	case ':': ColorChange(7, 7, colorlessmodecheck); break;
+	case '@': ColorChange(7, 0, colorlessmodecheck); break;
+	case '$': ColorChange(7, 4, colorlessmodecheck); break;
+	case 'E': ColorChange(6, 6, colorlessmodecheck); break;
+	default: ColorChange(0, 15, colorlessmodecheck);
 	}
 
 }
 
-void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
+void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC, Player* player, int colorlessmodecheck)
 {
 	char sign;
 	for (int i = 0; i < rows; i++)
@@ -41,13 +41,7 @@ void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
 		printf("\t\t\t");
 		for (int j = 0; j < cols; j++)
 		{
-			if (mas[i][j] == 'H' || mas[i][j] == 'S' || mas[i][j] == ':' || mas[i][j] == 'E') 
-			{
-				sign = mas[i][j];
-				ColorCheck(sign);
-				printf("%c", mas[i][j]);
-			}
-			else if (abs(i - PLR) <= 2 && abs(j - PLC) <= 2)
+			if (abs(i - PLR) <= 2 && abs(j - PLC) <= 2)
 			{
 				switch (mas[i][j])
 				{
@@ -58,28 +52,40 @@ void PrintMap(char mas[N][N], int rows, int cols, int PLR, int PLC)
 				case 'e': mas[i][j] = 'E'; break;
 				default: break;
 				}
-				if (mas[i][j] == '$') ColorCheck('&');
+				if (mas[i][j] == '$') ColorCheck('$', colorlessmodecheck);
 				else
 				{
 					sign = mas[i][j];
-					ColorCheck(sign);
+					ColorCheck(sign, colorlessmodecheck);
 				}
 				printf("%c", mas[i][j]);
+				ColorChange(0, 15, colorlessmodecheck);
+
+			}
+			else if (mas[i][j] == 'H' || mas[i][j] == 'S' || mas[i][j] == ':' || mas[i][j] == 'E' || mas[i][j] == '@')
+			{
+				sign = mas[i][j];
+				ColorCheck(sign, colorlessmodecheck);
+				printf("%c", mas[i][j]);
+				ColorChange(0, 15, colorlessmodecheck);
 			}
 			else if (mas[i][j] == '$')
 			{
-				ColorCheck('$');
+				ColorCheck(':', colorlessmodecheck);
 				printf("%c", mas[i][j]);
+				ColorChange(0, 15, colorlessmodecheck);
 			}
 			else
 			{
 				printf(" ");
-				ColorChange(0, 15);
+				ColorChange(0, 15, colorlessmodecheck);
 			}
+
 		}
 		printf("\n");
 	}
-	ColorChange(0, 15);
+	ColorChange(0, 15, colorlessmodecheck);
+	PlayerStatus(player);
 }
 
 void SetMapForNewGame(char mas[N][N], int rows, int cols)
@@ -151,7 +157,7 @@ void SetMapForSavedGame(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 		}
 		system("cls");
 	} while (SwitchCheck == 1);
-	
+
 	FILE* input;
 
 	fopen_s(&input, savename, "r");
@@ -166,7 +172,7 @@ void SetMapForSavedGame(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 	fclose(input);
 }
 
-int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& levelpasscount)
+int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& levelpasscount, Player* player, int& colorlessmodecheck)
 {
 	char input;
 	int MoveCheck;
@@ -188,7 +194,7 @@ int KeyboardInput(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int& l
 		case 'ф':
 		case 'a': MoveCheck = KeyboardInput_A(mas, rows, cols, PLR, PLC, levelpasscount); break;
 		case 'й':
-		case 'q': exit = MainMenu(mas, rows, cols, PLR, PLC); return exit; break;
+		case 'q': exit = MainMenu(mas, rows, cols, PLR, PLC, player, colorlessmodecheck); return exit; break;
 		default: MoveCheck = 1;
 		}
 	} while (MoveCheck == 1);
@@ -258,34 +264,38 @@ int StartGameChoice(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
 	} while (inputcheck == 1);
 }
 
-int MainMenu(char mas[N][N], int rows, int cols, int& PLR, int& PLC)
+int MainMenu(char mas[N][N], int rows, int cols, int& PLR, int& PLC, Player* player, int& colorlessmodecheck)
 {
-	system("cls");
-	char input;
-	printf("ПАУЗА\n\
+	{
+		system("cls");
+		char input;
+		printf("ПАУЗА\n\
     1.Новая игра\n\
     2.Загрузить игру\n\
     3.Сохранить игру\n\
     4.Справка\n\
-    5.Выход\n\
+    5.Включить/выключить бесцветный режим\n\
+    6.Выход\n\
     Нажмите q, чтобы продолжить.\n");
-	int inputcheck;
-	do
-	{
-		inputcheck = 0;
-		input = _getch();
-		switch (input)
+		int inputcheck;
+		do
 		{
-		case '1': system("cls"); PLR = 1; PLC = 1; SetMapForNewGame(mas, rows, cols); break;
-		case '2': system("cls"); SetMapForSavedGame(mas, rows, cols, PLR, PLC); break;
-		case '3': system("cls"); SaveGame(mas, rows, cols, PLR, PLC); break;
-		case '4': system("cls"); Tutorial(); MainMenu(mas, rows, cols, PLR, PLC); break;
-		case '5': system("cls"); return(1); break;
-		case 'й':
-		case 'q': system("cls"); PrintMap(mas, rows, cols, PLR, PLC); return(0); break;
-		default: inputcheck = 1; 
-		}
-	} while (inputcheck == 1);
+			inputcheck = 0;
+			input = _getch();
+			switch (input)
+			{
+			case '1': system("cls"); PLR = 1; PLC = 1; SetMapForNewGame(mas, rows, cols); break;
+			case '2': system("cls"); SetMapForSavedGame(mas, rows, cols, PLR, PLC); break;
+			case '3': system("cls"); SaveGame(mas, rows, cols, PLR, PLC); break;
+			case '4': system("cls"); Tutorial(); MainMenu(mas, rows, cols, PLR, PLC, player, colorlessmodecheck); break;
+			case '5': system("cls"); if (colorlessmodecheck == 0) colorlessmodecheck = 1; else colorlessmodecheck = 0; break;
+			case '6': system("cls"); return(1); break;
+			case 'й':
+			case 'q': system("cls"); PrintMap(mas, rows, cols, PLR, PLC, player, colorlessmodecheck); return(0); break;
+			default: inputcheck = 1;
+			}
+		} while (inputcheck == 1);
+	}
 }
 
 void Tutorial()
@@ -293,8 +303,14 @@ void Tutorial()
 	char input;
 	printf("СПРАВКА\n");
 	printf("w, a, d, s - ходьба.\n");
-	printf("q - открыть/закрыть меню.\n");
-	printf("нажмите q, чтобы закрыть справку.\n");
+	printf("q - открыть/закрыть меню.\n\n");
+	printf("ОБОЗНАЧЕНИЯ\n");
+	printf("@ - Вы\n");
+	printf("$ - Противник\n");
+	printf("H - Стена\n");
+	printf(": - Пол\n");
+	printf("E - Выход\n");
+	printf("нажмите q, чтобы закрыть справку.\n\n");
 	do
 	{
 		input = _getch();
@@ -302,22 +318,34 @@ void Tutorial()
 	system("cls");
 }
 
-void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int a, int b, Enemy* enemy, int& ec, int& levelpasscount)
+void GameItteration(char mas[N][N], int rows, int cols, int& PLR, int& PLC, int a, int b, Enemy* enemy, int& ec, int& levelpasscount, Player* player, Boss* boss, int& colorlessmodecheck)
 {
 	int exit = 0;
+	Bfind(mas, rows, cols, boss);
 	do
 	{
 		ec = enemycount1(mas, rows, cols, enemy);
-		exit = KeyboardInput(mas, rows, cols, PLR, PLC, levelpasscount);
+		exit = KeyboardInput(mas, rows, cols, PLR, PLC, levelpasscount, player, colorlessmodecheck);
 		if (exit == 1) break;
 		AllEnemyMove(mas, enemy, ec, a, b, PLC, PLR);
-		battleSearch(mas,ec,player, enemy, PLR, PLC);
+		battleSearch(mas, ec, player, enemy, PLR, PLC);
+		Bseach(mas, player, boss, PLR, PLC);
 		system("cls");
-		PrintMap(mas, rows, cols, PLR, PLC);
+		PrintMap(mas, rows, cols, PLR, PLC, player, colorlessmodecheck);
 	} while (true);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PlayerStatus(Player* player)
+{
+	printf("\n\
+HP - %i\n\
+XP - %i\n\
+ATK - %i\n\
+DF - %i\n\
+LVL - %i\n", player[1].HP, player[1].XP, player[1].ATK, player[1].DF, player[1].LVL);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main()
 {
@@ -325,7 +353,7 @@ int main()
 	system("chcp 1251");
 	system("cls");
 	char mas[N][N];
-	int rows = 30, cols = 80, ec = 0, a = 0, b = 0, exit = 0, levelpasscount = 1;
+	int rows = 30, cols = 80, ec = 0, a = 0, b = 0, exit = 0, levelpasscount = 1, colorlessmodecheck = 0;
 	//PLR = PlayerLocationRows
 	//PLC = PlayerLocationCols
 	int PLR = 1, PLC = 1;
@@ -333,8 +361,8 @@ int main()
 	{
 		exit = StartGameChoice(mas, rows, cols, PLR, PLC);
 		if (exit == 1) break;
-		PrintMap(mas, rows, cols, PLR, PLC);
-		GameItteration(mas, rows, cols, PLR, PLC, a, b, enemy, ec, levelpasscount);
+		PrintMap(mas, rows, cols, PLR, PLC, player, colorlessmodecheck);
+		GameItteration(mas, rows, cols, PLR, PLC, a, b, enemy, ec, levelpasscount, player, boss, colorlessmodecheck);
 	} while (exit == 1);
 
 	//system("pause");
